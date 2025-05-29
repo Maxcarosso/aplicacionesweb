@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
+import Toast from 'react-native-root-toast';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -9,14 +10,28 @@ export default function LoginScreen({ navigation }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const validate = () => {
+    if (!email) return 'El email es obligatorio';
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return 'El email no es válido';
+    if (!password) return 'La contraseña es obligatoria';
+    return '';
+  };
+
   const handleLogin = async () => {
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setError('');
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      Toast.show('¡Bienvenido!', { duration: Toast.durations.SHORT, backgroundColor: '#ff8800', textColor: '#fff' });
       // El usuario será redirigido automáticamente si usas un listener en App.js
     } catch (e) {
       setError('Email o contraseña incorrectos');
+      Toast.show('Email o contraseña incorrectos', { duration: Toast.durations.SHORT, backgroundColor: 'red', textColor: '#fff' });
     } finally {
       setLoading(false);
     }

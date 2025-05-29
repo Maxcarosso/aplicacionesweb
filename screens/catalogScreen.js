@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
@@ -24,15 +25,15 @@ export default function CatalogScreen({ navigation }) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('Perfil')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Perfil')} accessibilityLabel="Ir a perfil" accessibilityRole="button">
           <Text style={{ color: '#ff8800', fontWeight: 'bold', fontSize: 16 }}>{userEmail}</Text>
         </TouchableOpacity>
       ),
       headerRight: () => (
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={() => navigation.navigate('Carrito')} style={{ marginRight: 16 }}>
+          <TouchableOpacity onPress={() => navigation.navigate('Carrito')} style={{ marginRight: 16 }} accessibilityLabel="Ir al carrito" accessibilityRole="button">
             <View>
-              <Text style={{ fontSize: 24 }}>🛒</Text>
+              <MaterialIcons name="shopping-cart" size={28} color="#ff8800" />
               {totalItems > 0 && (
                 <View style={{
                   position: 'absolute',
@@ -51,8 +52,8 @@ export default function CatalogScreen({ navigation }) {
               )}
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => signOut(auth)} style={{ marginRight: 8 }}>
-            <Text style={{ color: '#ff8800', fontWeight: 'bold', fontSize: 16 }}>Salir</Text>
+          <TouchableOpacity onPress={() => signOut(auth)} style={{ marginRight: 8 }} accessibilityLabel="Cerrar sesión" accessibilityRole="button">
+            <MaterialIcons name="logout" size={24} color="#ff8800" />
           </TouchableOpacity>
         </View>
       ),
@@ -69,7 +70,13 @@ export default function CatalogScreen({ navigation }) {
       <Text style={styles.name}>{item.name}</Text>
       <Text style={styles.brand}>{item.brand}</Text>
       <Text style={styles.price}>${item.price}</Text>
-      <TouchableOpacity style={styles.detailButton} onPress={() => navigation.navigate('Detalle', { product: item })}>
+      <TouchableOpacity
+        style={styles.detailButton}
+        onPress={() => navigation.navigate('Detalle', { product: item })}
+        accessibilityLabel={`Ver detalle de ${item.name}`}
+        accessibilityRole="button"
+      >
+        <MaterialIcons name="info-outline" size={20} color="#fff" style={{ marginRight: 6 }} />
         <Text style={styles.detailButtonText}>Ver Detalle</Text>
       </TouchableOpacity>
     </View>
@@ -115,6 +122,6 @@ const styles = StyleSheet.create({
   name: { fontSize: width * 0.05, fontWeight: 'bold', color: '#ff8800' },
   brand: { fontSize: width * 0.04, color: '#888' },
   price: { fontSize: width * 0.045, color: '#ff8800', marginTop: 4 },
-  detailButton: { backgroundColor: '#ff8800', borderRadius: 6, paddingVertical: 8, paddingHorizontal: 18, marginTop: 10 },
+  detailButton: { flexDirection: 'row', backgroundColor: '#ff8800', borderRadius: 6, paddingVertical: 8, paddingHorizontal: 18, marginTop: 10, alignItems: 'center', justifyContent: 'center' },
   detailButtonText: { color: '#fff', fontWeight: 'bold', fontSize: width * 0.04 },
 });

@@ -16,6 +16,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebaseConfig';
 import ProfileScreen from './screens/ProfileScreen';
 import LocalUserScreen from './screens/LocalUserScreen';
+import { TransitionPresets } from '@react-navigation/stack';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,7 +37,12 @@ function AppNavigator() {
   return (
     <NavigationContainer>
       <StatusBar style="light" backgroundColor="#ff8800" />
-      <Stack.Navigator screenOptions={{ headerShown: true }}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: true,
+          ...TransitionPresets.SlideFromRightIOS,
+        }}
+      >
         {user ? (
           <>
             <Stack.Screen name="Catálogo" component={CatalogScreen} />

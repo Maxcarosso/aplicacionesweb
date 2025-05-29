@@ -5,6 +5,7 @@ import { auth, db, storage } from '../firebaseConfig';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import Toast from 'react-native-root-toast';
 
 export default function ProfileScreen() {
   const [email, setEmail] = useState('');
@@ -51,8 +52,10 @@ export default function ProfileScreen() {
       }
       await setDoc(doc(db, 'users', user.uid), { name, photoURL }, { merge: true });
       Alert.alert('Perfil actualizado');
+      Toast.show('Perfil actualizado correctamente', { duration: Toast.durations.SHORT, backgroundColor: '#ff8800', textColor: '#fff' });
     } catch (e) {
       Alert.alert('Error al guardar el perfil');
+      Toast.show('Error al guardar el perfil', { duration: Toast.durations.SHORT, backgroundColor: 'red', textColor: '#fff' });
     } finally {
       setSaving(false);
     }

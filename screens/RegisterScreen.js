@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
+import Toast from 'react-native-root-toast';
 
 export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -9,14 +10,29 @@ export default function RegisterScreen({ navigation }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const validate = () => {
+    if (!email) return 'El email es obligatorio';
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return 'El email no es válido';
+    if (!password) return 'La contraseña es obligatoria';
+    if (password.length < 6) return 'La contraseña debe tener al menos 6 caracteres';
+    return '';
+  };
+
   const handleRegister = async () => {
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setError('');
     setLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
+      Toast.show('¡Registro exitoso! Ahora puedes iniciar sesión.', { duration: Toast.durations.SHORT, backgroundColor: '#ff8800', textColor: '#fff' });
       // El usuario será redirigido automáticamente si usas un listener en App.js
     } catch (e) {
       setError('No se pudo registrar. El email puede estar en uso o la contraseña es muy débil.');
+      Toast.show('No se pudo registrar. El email puede estar en uso o la contraseña es muy débil.', { duration: Toast.durations.SHORT, backgroundColor: 'red', textColor: '#fff' });
     } finally {
       setLoading(false);
     }

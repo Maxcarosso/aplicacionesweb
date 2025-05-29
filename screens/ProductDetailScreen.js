@@ -1,10 +1,11 @@
 // screens/ProductDetailScreen.js
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, Button, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, Button, TouchableOpacity, ScrollView, Dimensions, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../store/cartSlice';
 import Toast from 'react-native-root-toast';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
@@ -12,6 +13,20 @@ export default function ProductDetailScreen({ route }) {
   const { product } = route.params;
   const dispatch = useDispatch();
   const [selectedSize, setSelectedSize] = useState(null);
+  const [scaleValue] = useState(new Animated.Value(1));
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      Toast.show('Selecciona una talla antes de agregar al carrito', { duration: Toast.durations.SHORT, backgroundColor: '#ffa94d', textColor: '#fff' });
+      return;
+    }
+    Animated.sequence([
+      Animated.timing(scaleValue, { toValue: 1.1, duration: 120, useNativeDriver: true }),
+      Animated.timing(scaleValue, { toValue: 1, duration: 120, useNativeDriver: true }),
+    ]).start();
+    dispatch(addToCart({ ...product, selectedSize }));
+    Toast.show('Producto agregado al carrito', { duration: Toast.durations.SHORT, backgroundColor: '#ff8800', textColor: '#fff' });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -35,18 +50,18 @@ export default function ProductDetailScreen({ route }) {
           ))}
         </View>
         <View style={styles.buttonWrapper}>
-          <Button
-            title="Agregar al carrito"
-            onPress={() => {
-              if (!selectedSize) {
-                Toast.show('Selecciona una talla antes de agregar al carrito', { duration: Toast.durations.SHORT, backgroundColor: '#ffa94d', textColor: '#fff' });
-                return;
-              }
-              dispatch(addToCart({ ...product, selectedSize }));
-              Toast.show('Producto agregado al carrito', { duration: Toast.durations.SHORT, backgroundColor: '#ff8800', textColor: '#fff' });
-            }}
-            color="#ff8800"
-          />
+          <Animated.View style={{ transform: [{ scale: scaleValue }], width: '100%' }}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={handleAddToCart}
+              accessibilityLabel="Agregar al carrito"
+              accessibilityRole="button"
+              activeOpacity={0.8}
+            >
+              <MaterialIcons name="add-shopping-cart" size={24} color="#fff" style={{ marginRight: 8 }} />
+              <Text style={styles.addButtonText}>Agregar al carrito</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -66,5 +81,7 @@ const styles = StyleSheet.create({
   sizeButtonSelected: { backgroundColor: '#ffe066', borderColor: '#ff8800' },
   size: { fontSize: width * 0.04, color: '#888' },
   sizeSelected: { color: '#ff8800', fontWeight: 'bold' },
-  buttonWrapper: { width: '100%', marginTop: 24 },
+  buttonWrapper: { width: '100%', marginTop: 24, alignItems: 'center' },
+  addButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ff8800', borderRadius: 8, paddingVertical: 14, paddingHorizontal: 24, width: '100%' },
+  addButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
 });
