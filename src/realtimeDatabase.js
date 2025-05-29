@@ -1,0 +1,1 @@
+export const baseUrl = "https://maxtenis-495f5-default-rtdb.firebaseio.com/";
